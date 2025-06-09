@@ -5,12 +5,12 @@ and the child will take the version from here, we have to define the dependency 
 defined in the parent tag. Inside the profiles tag, we have defined the child pom, so that if I clean this pom, it will clean and build the child pom too-->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.0</version>
+		<version>3.3.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -46,23 +46,55 @@ defined in the parent tag. Inside the profiles tag, we have defined the child po
 
 	<properties>
 		<java.version>21</java.version>
-		<spring-boot.version>3.5.0</spring-boot.version>
-		<spring-cloud.version>2025.0.0-RC1</spring-cloud.version>
+		<spring-boot.version>3.3.3</spring-boot.version> <!-- Align with spring-boot-starter-parent version -->
+		<spring-cloud.version>2023.0.1</spring-cloud.version>
 		<modelmapper.version>3.2.3</modelmapper.version>
-		<lombok.version>1.18.38</lombok.version>
-		<mysql.version>9.3.0</mysql.version>
-		<spring-boot-test.version>3.5.0</spring-boot-test.version>
+		<lombok.version>1.18.30</lombok.version> <!-- Aligned with typical compatible version -->
+		<mysql.version>8.0.33</mysql.version>
+		<spring-cloud-netflix.version>4.0.1</spring-cloud-netflix.version>
+		<springdoc-openapi.version>2.3.0</springdoc-openapi.version>
+		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
+		<lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version> <!-- New property for the binding -->
 	</properties>
 
 	<modules>
 		<module>product-service</module>
 		<module>order-service</module>
 		<module>payment-service</module>
+		<module>discovery-service</module>
+		<module>api-gateway</module>
+		<module>admin_server</module>
 		<!-- Add more modules here later -->
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
+			<!-- Spring Cloud Dependencies -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- Spring Cloud Netflix BOM (must be added separately) -->
+			<!-- Note: Spring Cloud Netflix support is largely deprecated in newer Spring Cloud versions.
+                 If you are on 2023.0.x (which is compatible with SB 3.1+), you should be using Spring Cloud LoadBalancer
+                 and other native Spring Cloud features rather than Netflix specific ones like Eureka Client/Server directly.
+                 However, if you specifically need the old Netflix components for compatibility, this is fine.
+                 Just be aware of the shift in Spring Cloud's ecosystem. -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-netflix-dependencies</artifactId>
+				<version>${spring-cloud-netflix.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- Spring Boot Starters: Versions are now managed by spring-boot-starter-parent.
+                 Explicitly defining version for every starter is redundant and can cause issues if not aligned.
+                 Remove the <version> tag from individual starters here. -->
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -75,75 +107,161 @@ defined in the parent tag. Inside the profiles tag, we have defined the child po
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-validation</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-actuator</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-devtools</artifactId>
 				<version>${spring-boot.version}</version>
 				<scope>runtime</scope>
 				<optional>true</optional>
 			</dependency>
+
+			<!-- Database Driver -->
 			<dependency>
 				<groupId>com.mysql</groupId>
 				<artifactId>mysql-connector-j</artifactId>
 				<version>${mysql.version}</version>
 				<scope>runtime</scope>
 			</dependency>
+
+			<!-- Development Tools -->
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
 				<version>${lombok.version}</version>
+				<scope>provided</scope>
 				<optional>true</optional>
 			</dependency>
 			<dependency>
-				<groupId>org.modelmapper</groupId>
-				<artifactId>modelmapper</artifactId>
-				<version>${modelmapper.version}</version>
+				<groupId>org.mapstruct</groupId>
+				<artifactId>mapstruct</artifactId>
+				<version>${org.mapstruct.version}</version>
 			</dependency>
-	<!--		<dependency>
-				<groupId>org.hibernate.orm</groupId>
-				<artifactId>hibernate-core</artifactId>
-				<version>${hibernate.version}</version>
-			</dependency>-->
+			<!-- mapstruct-processor should typically be an 'annotationProcessor' dependency,
+                 but it can be listed here in dependencyManagement with scope 'provided' if needed.
+                 The key is to include it in the compiler plugin's annotationProcessorPaths. -->
 			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-validation</artifactId>
-				<version>${spring-boot.version}</version>
+				<groupId>org.mapstruct</groupId>
+				<artifactId>mapstruct-processor</artifactId>
+				<version>${org.mapstruct.version}</version>
+				<scope>provided</scope> <!-- Keep as provided or remove if solely handled by pluginManagement below -->
 			</dependency>
+			<!-- Add lombok-mapstruct-binding here in dependencyManagement -->
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok-mapstruct-binding</artifactId>
+				<version>${lombok-mapstruct-binding.version}</version>
+				<scope>provided</scope> <!-- Provided scope as it's for compilation -->
+			</dependency>
+
+			<!-- Test Dependencies -->
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-test</artifactId>
-				<version>${spring-boot-test.version}</version>
+				<version>${spring-boot.version}</version>
 				<scope>test</scope>
 			</dependency>
+
+			<!-- Eureka Server / Client - These are usually handled by spring-cloud-dependencies BOM,
+                 but if explicit versions are needed for Netflix parts, keep them. -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+				<version>${spring-cloud-netflix.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+				<version>${spring-cloud-netflix.version}</version>
+			</dependency>
+
+			<!-- Springdoc OpenAPI (Swagger UI) -->
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+				<version>${springdoc-openapi.version}</version>
+			</dependency>
+
+			<!-- Spring Cloud Gateway -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-starter-gateway</artifactId>
+				<version>4.0.8</version> <!-- If this is a specific override, keep; otherwise, let spring-cloud-dependencies manage -->
+			</dependency>
+
+			<!-- Spring Boot Admin Client -->
+			<dependency>
+				<groupId>de.codecentric</groupId>
+				<artifactId>spring-boot-admin-starter-client</artifactId>
+				<version>3.2.0</version> <!-- If this is a specific override, keep -->
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
 	<build>
+		<pluginManagement> <!-- Use pluginManagement to configure plugins for child modules -->
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.11.0</version> <!-- Pin the version -->
+					<configuration>
+						<!-- Annotation processor paths for Lombok, MapStruct, and the binding -->
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+								<version>${lombok.version}</version>
+							</path>
+							<path>
+								<groupId>org.mapstruct</groupId>
+								<artifactId>mapstruct-processor</artifactId>
+								<version>${org.mapstruct.version}</version>
+							</path>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok-mapstruct-binding</artifactId>
+								<version>${lombok-mapstruct-binding.version}</version>
+							</path>
+						</annotationProcessorPaths>
+						<!-- Ensure MapStruct uses Spring component model by default -->
+						<compilerArgs>
+							<arg>-Amapstruct.defaultComponentModel=spring</arg>
+						</compilerArgs>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<!-- Inherit version from spring-boot-starter-parent, or define explicitly if different -->
+					<version>${spring-boot.version}</version>
+					<configuration>
+						<excludes>
+							<exclude>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+							</exclude>
+						</excludes>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<!-- No direct <plugins> section here if parent is just for management,
+             unless parent itself builds something or needs specific plugin executions. -->
+		<!-- Remove the old <plugins> block from here that contained maven-compiler-plugin with <skip>true</skip>
+             and spring-boot-maven-plugin with <skip>true</skip>. These configs are now in pluginManagement. -->
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<skip>true</skip> <!-- Skip execution in the parent -->
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<skip>true</skip> <!-- Skip execution in the parent -->
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
+			<!-- You typically don't run the compiler plugin directly in the parent if it's a `pom` packaging.
+                 Its configuration in `pluginManagement` ensures child modules pick it up. -->
+			<!-- If you have a specific plugin to run for the parent project itself, add it here. -->
 		</plugins>
 	</build>
 
@@ -154,13 +272,17 @@ defined in the parent tag. Inside the profiles tag, we have defined the child po
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
+				<!-- It's redundant to list modules here again if they are already in the top-level <modules> tag.
+                     The top-level <modules> tag already dictates what modules are part of this multi-module build.
+                     Profiles are typically used for *conditional* inclusion of modules (e.g., specific environment builds).
+                     If you always want to build all of these, keep them in the top-level <modules> tag. -->
 				<module>product-service</module>
 				<module>order-service</module>
 				<module>payment-service</module>
+				<module>discovery-service</module>
+				<module>api-gateway</module>
+				<module>admin_server</module>
 			</modules>
 		</profile>
 	</profiles>
-
-
-
 </project>

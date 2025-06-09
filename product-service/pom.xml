@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -14,11 +14,8 @@
 	<name>product-service</name>
 	<description>Spring Boot module for product service </description>
 
-	<properties>
-		<java.version>21</java.version>
-	</properties>
-
 	<dependencies>
+		<!-- Spring Boot Starters: Versions are now managed by parent's dependencyManagement (from spring-boot-starter-parent) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -33,28 +30,72 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>com.mysql</groupId>
-			<artifactId>mysql-connector-j</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.modelmapper</groupId>
-			<artifactId>modelmapper</artifactId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Database Driver: Version managed by parent's dependencyManagement -->
+		<dependency>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- Development Tools: Versions managed by parent's dependencyManagement -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<!-- Scope and version are managed by parent's dependencyManagement and pluginManagement -->
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<!-- Version managed by parent's dependencyManagement -->
+		</dependency>
+		<!-- MapStruct Processor: Declare explicitly for this module, but version and scope are managed by parent's dependencyManagement -->
+		<!-- Also, Lombok-MapStruct-Binding is handled by the compiler plugin configuration in the parent. -->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-processor</artifactId>
+			<scope>provided</scope> <!-- Important for compilation, not runtime -->
+		</dependency>
+		<!-- Add lombok-mapstruct-binding as a dependency here explicitly if you want it to be part of the module's transitive dependencies,
+             though it's primarily an annotation processor which is handled by pluginManagement now.
+             It's good practice to declare it if it's used as a dependency, but for APs, the pluginManagement covers it. -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok-mapstruct-binding</artifactId>
+			<scope>provided</scope> <!-- Provided scope for annotation processor -->
+		</dependency>
+
+		<!-- Spring Cloud Dependencies: Versions managed by parent's dependencyManagement -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+		<!-- Spring Boot Admin Client: Version managed by parent's dependencyManagement -->
+		<dependency>
+			<groupId>de.codecentric</groupId>
+			<artifactId>spring-boot-admin-starter-client</artifactId>
+		</dependency>
+
+		<!-- Springdoc OpenAPI (Swagger UI): Version managed by parent's dependencyManagement -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -62,14 +103,8 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
+				<!-- NO configuration or version needed here.
+                     All annotation processor paths and compiler args are inherited from the parent's pluginManagement. -->
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -81,15 +116,11 @@
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
+				<!-- NO configuration or version needed here.
+                     Excludes for Lombok are inherited from the parent's pluginManagement. -->
 			</plugin>
+			<!-- REMOVE THE DUPLICATE MAVEN-COMPILER-PLUGIN DECLARATION BELOW.
+                 It was causing the conflict and the original issue. -->
 		</plugins>
 	</build>
 

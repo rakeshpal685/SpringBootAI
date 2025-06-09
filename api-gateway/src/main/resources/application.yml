@@ -1,0 +1,125 @@
+# Server Configuration
+server:
+  port: 8080  # Port on which the gateway will run
+
+
+
+# Spring Application Configuration
+spring:
+  application:
+    name: api-gateway  # The name of this service, used in Eureka for registration
+
+  cloud:
+    discovery:
+      enabled: true  # Optional, can be omitted
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://localhost:8761/eureka/  # Eureka server URL
+ #this is for gateway
+    gateway:
+      # Enabling the DiscoveryClient Route Locator to automatically discover services registered with Eureka
+      discovery.locator:
+        enabled: true  # Enable discovery locator
+        lower-case-service-id: true  # Convert service IDs to lowercase for consistent routing
+      routes:
+        # Route configuration for the Product Service API
+        - id: product-service  # Unique ID for this route
+          uri: lb://product-service  # Load balancing to the service registered in Eureka with name 'product-service'
+          predicates:
+            - Path=/api/products/**  # Route requests starting with /api/products/** to the Product service
+
+        # Route configuration for the Order Service API
+        - id: order-service  # Unique ID for this route
+          uri: lb://order-service  # Load balancing to the service registered in Eureka with name 'order-service'
+          predicates:
+            - Path=/api/orders/**  # Route requests starting with /api/orders/** to the Order service
+
+        # Route configuration for the Payment Service API
+        - id: payment-service  # Unique ID for this route
+          uri: lb://payment-service  # Load balancing to the service registered in Eureka with name 'payment-service'
+          predicates:
+            - Path=/api/payments/**  # Route requests starting with /api/payments/** to the Payment service
+
+        # Route configuration for the Product Service Swagger UI
+        - id: product-swagger-ui  # Unique ID for this route
+          uri: lb://product-service  # Load balancing to the product-service to access Swagger UI
+          predicates:
+            - Path=/product-service/swagger-ui.html  # Path for Swagger UI home page of product service
+            - Path=/product-service/swagger-ui/**  # Catch all paths for Swagger UI related requests
+            - Path=/product-service/v3/api-docs  # API docs for the product service
+            - Path=/product-service/v3/api-docs/**  # Catch all API docs paths
+            - Path=/product-service/webjars/**  # Webjars (static content) for the product service Swagger UI
+          filters:
+            # Rewrite the internal path to remove the /product-service prefix
+            - "RewritePath=/product-service/(?<segment>.*), /${segment}"
+
+        # Route configuration for the Order Service Swagger UI
+        - id: order-swagger-ui  # Unique ID for this route
+          uri: lb://order-service  # Load balancing to the order-service to access Swagger UI
+          predicates:
+            - Path=/order-service/swagger-ui.html  # Path for Swagger UI home page of order service
+            - Path=/order-service/swagger-ui/**  # Catch all paths for Swagger UI related requests
+            - Path=/order-service/v3/api-docs  # API docs for the order service
+            - Path=/order-service/v3/api-docs/**  # Catch all API docs paths
+            - Path=/order-service/webjars/**  # Webjars (static content) for the order service Swagger UI
+          filters:
+            # Rewrite the internal path to remove the /order-service prefix
+            - "RewritePath=/order-service/(?<segment>.*), /${segment}"
+
+        # Route configuration for the Payment Service Swagger UI
+        - id: payment-swagger-ui  # Unique ID for this route
+          uri: lb://payment-service  # Load balancing to the payment-service to access Swagger UI
+          predicates:
+            - Path=/payment-service/swagger-ui.html  # Path for Swagger UI home page of payment service
+            - Path=/payment-service/swagger-ui/**  # Catch all paths for Swagger UI related requests
+            - Path=/payment-service/v3/api-docs  # API docs for the payment service
+            - Path=/payment-service/v3/api-docs/**  # Catch all API docs paths
+            - Path=/payment-service/webjars/**  # Webjars (static content) for the payment service Swagger UI
+          filters:
+            # Rewrite the internal path to remove the /payment-service prefix
+            - "RewritePath=/payment-service/(?<segment>.*), /${segment}"
+
+
+  # Enable the endpoints for the admin server (e.g., health checks, etc.)
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090  # URL for the Admin Server for monitoring and management
+
+# Logging Configuration
+logging:
+  level:
+    org.springframework: INFO  # Set the log level for Spring packages to INFO
+    com.example: DEBUG  # Set the log level for your application's packages to DEBUG (useful for debugging)
+
+# Actuator Configuration for exposing management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  # Expose all actuator endpoints, e.g., /actuator/health, /actuator/env, etc.
+  # Optional: change the base path for actuator endpoints if needed
+  base-path: /actuator  # All actuator endpoints will be accessible under /actuator
+  endpoint:
+    health:
+      show-details: always  # Always show detailed health information (useful for debugging)
+
+#Using the above route configuration for swagger, we can route to individual service using the below URLs, but if we want a common url throw gateway then include the below configuration,
+#  http://localhost:8080/order-service/v3/api-docs
+#  http://localhost:8080/product-service/v3/api-docs
+#  http://localhost:8080/payment-service/v3/api-docs
+#If we want to route through the gateway then use the below URL, and we can see all the swagger there
+#http://localhost:8080/swagger-ui
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - name: Product Service
+        url: /product-service/v3/api-docs
+      - name: Order Service
+        url: /order-service/v3/api-docs
+      - name: Payment Service
+        url: /payment-service/v3/api-docs
