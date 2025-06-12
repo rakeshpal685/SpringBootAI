@@ -136,6 +136,10 @@ public class Product {
      */
     @Enumerated(EnumType.STRING) // Configures the `status` enum to be stored as its string name in the database.
     @Column(name = "status") // Maps this field to a database column named 'status'.
+    @EnumSubset( //This is the custom validation I have created to validate the emun in the request, check CustomValicdationForDTo folder inside Exception folder
+        anyOf = {ProductStatus.AVAILABLE, ProductStatus.OUT_OF_STOCK, ProductStatus.DISCONTINUED},
+        message = "Invalid product status. Allowed values: AVAILABLE, OUT_OF_STOCK, DISCONTINUED"
+    )    
     private ProductStatus status; // The current status of the product (e.g., AVAILABLE, OUT_OF_STOCK).
 
     /**
