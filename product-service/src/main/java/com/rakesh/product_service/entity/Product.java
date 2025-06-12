@@ -164,6 +164,19 @@ public class Product {
      *   2. In your entity, declare a field of that `@Embeddable` type and annotate it with `@Embedded`.
      */
     @Embedded // Embeds the fields of the `ProductDetails` class directly into the 'products' table.
+     /* @AttributeOverrides({
+        * @AttributeOverride(name = "street", column = @Column(name = "home_street")),
+        *@AttributeOverride(name = "city", column = @Column(name = "home_city")),
+        *@AttributeOverride(name = "zipCode", column = @Column(name = "home_zip"))
+    *})
+    * Use the above If we are using the embeddable class in multiple tables but with different names of the column in the every main table, in this case we have to remove the @column from the embedable class
+    *If we wanted to embed ProductDetails twice (e.g., as details and importedDetails) in the same entity, you must override the column names like this:
+    *@Embedded
+    *@AttributeOverrides({
+    *@AttributeOverride(name = "manufacturer", column = @Column(name = "imported_manufacturer"))
+    *})
+    *private ProductDetails importedDetails;
+    */
     private ProductDetails details; // A value object holding additional product details like manufacturer, weight, etc.
 
     // --- Relationships (Not implemented in this specific entity, but commonly used) ---
