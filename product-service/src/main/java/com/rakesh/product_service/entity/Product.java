@@ -26,7 +26,8 @@ import java.util.Date; // Legacy Date class, used here specifically for @Tempora
 @Data // Lombok: Generates boilerplate code like getters, setters, toString(), equals(), and hashCode() methods automatically.
 @NoArgsConstructor // Lombok: Generates a no-argument constructor. Required by JPA for entity instantiation.
 @AllArgsConstructor // Lombok: Generates a constructor with arguments for all fields. Useful for creating new entity instances.
-public class Product {
+//Base Entity will have some common fields that can be used for other entities, somewhat like @Embedded
+public class Product extends BaseEntity{
 
     @Id // Marks this field as the primary key of the entity.
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Configures how the primary key values are generated. IDENTITY means the database auto-increments the ID.
@@ -57,6 +58,7 @@ public class Product {
     @Column(name = "quantity_in_stock") // Maps to a database column named 'quantity_in_stock'.
     private Integer quantityInStock; // The number of units currently available in stock.
 
+ /** createdAt, updatedAt and version is moved to the base entity
     @CreationTimestamp // Hibernate specific: Automatically sets the field's value to the current timestamp when the entity is first persisted (inserted).
     @Column(name = "created_at", // Maps to a database column named 'created_at'.
             updatable = false) // Specifies that this column's value cannot be updated after its initial creation.
@@ -83,10 +85,10 @@ public class Product {
      * Data Type: Typically an `Integer`, `Long`, `Short`, `Timestamp`, or `Calendar`. Hibernate manages this field.
      * Usage: Add `@Version` to a numeric or timestamp field in your entity. You do *not* set or update this field manually in your application code.
      */
-    @Version
-    @Column(name = "version") // Optional: specifies the column name in the database for the version field.
-    private Integer version; // Integer field to store the entity's version for optimistic locking.
-
+    /*@Version
+    *@Column(name = "version") // Optional: specifies the column name in the database for the version field.
+    *private Integer version; // Integer field to store the entity's version for optimistic locking.
+    */
     /**
      * `@Temporal(TemporalType.DATE)`
      * Purpose: Specifies the exact database column type for `java.util.Date` or `java.util.Calendar` fields.
