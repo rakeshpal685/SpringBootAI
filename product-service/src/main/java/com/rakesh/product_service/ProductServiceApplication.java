@@ -15,10 +15,18 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 				description = "API documentation for the Product Service"
 		)
 )
+@EnableJpaAuditing(auditorAwareRef = "auditorProvider")//This is for automatically updating the table in the column createdBy and updatedBy
 public class ProductServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ProductServiceApplication.class, args);
 	}
+
+//This is for automatically updating the table in the column createdBy and updatedBy with the current logged in user
+@Bean
+public AuditorAware<String> auditorProvider() {
+    return () -> Optional.of("system"); // Replace with user from SecurityContext in real use
+}
+	
 
 }
