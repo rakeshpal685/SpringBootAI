@@ -126,6 +126,13 @@ public class Product {
      *   - `EnumType.STRING`: (Recommended) Persists the enum's name (the string representation, e.g., "AVAILABLE") as a `VARCHAR` string in the database.
      *     **Benefit:** This is much safer and more robust as it's less affected by changes to the enum's order or addition of new constants (as long as existing names aren't changed).
      * Usage: Apply `@Enumerated` to the enum field in your entity and explicitly specify `EnumType.STRING` for safety.
+     * 
+     *We can define Inline enum also inside the entity, rather then creating a dife=ferent class, if we want to use the enum for only this entiry
+     *public enum ProductStatus {
+     *   AVAILABLE,
+     *  OUT_OF_STOCK,
+     *   DISCONTINUED
+     * }
      */
     @Enumerated(EnumType.STRING) // Configures the `status` enum to be stored as its string name in the database.
     @Column(name = "status") // Maps this field to a database column named 'status'.
