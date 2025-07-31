@@ -14,10 +14,25 @@ import java.util.Map;
 @ControllerAdvice // Makes this class a global exception handler
 public class GlobalExceptionHandler {
 
+    /*
+    When springboot finds a method for a particular exception defined below then it will run that method, if not found
+    then it will run this general method
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionResponseDetails> handleGlobalException(Exception ex, WebRequest request) {
+        ExceptionResponseDetails errorDetails = new ExceptionResponseDetails(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                request.getDescription(false),
+                "INTERNAL_SERVER_ERROR"
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     // Handles specific ResourceNotFoundException
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(
+    public ResponseEntity<ExceptionResponseDetails> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+        ExceptionResponseDetails errorDetails = new ExceptionResponseDetails(
                 LocalDateTime.now(),
                 ex.getMessage(),
                 request.getDescription(false),
@@ -43,15 +58,5 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
-    // Handles other general exceptions
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDetails> handleGlobalException(Exception ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false),
-                "INTERNAL_SERVER_ERROR"
-        );
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+
 }

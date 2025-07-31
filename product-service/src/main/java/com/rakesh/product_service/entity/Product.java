@@ -1,5 +1,6 @@
 package com.rakesh.product_service.entity;
 
+import com.rakesh.product_service.exception.customAnnotationForDTO.EnumSubset;
 import jakarta.persistence.*; // Core JPA annotations
 import lombok.AllArgsConstructor; // Lombok for generating constructor with all fields
 import lombok.Data; // Lombok for generating getters, setters, toString, equals, hashCode

@@ -1,3 +1,7 @@
+package com.rakesh.product_service.exception.customAnnotationForDTO;
+
+import com.rakesh.product_service.entity.ProductStatus;
+import com.rakesh.product_service.exception.customAnnotationForDTO.EnumSubsetValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 

@@ -2,7 +2,7 @@ package com.rakesh.product_service.controller;
 
 import com.rakesh.product_service.dto.PaginatedProductResponseDto;
 import com.rakesh.product_service.dto.ProductDto;
-import com.rakesh.product_service.exception.ErrorDetails;
+import com.rakesh.product_service.exception.ExceptionResponseDetails;
 import com.rakesh.product_service.exception.ValidationErrorDetails;
 import com.rakesh.product_service.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,7 +69,7 @@ public class ProductController {
                     schema = @Schema(implementation = ProductDto.class)))
     @ApiResponse(responseCode = "404", description = "Product not found",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDetails.class)))
+                    schema = @Schema(implementation = ExceptionResponseDetails.class)))
     public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
         ProductDto product = productService.getProductById(id);
         return ResponseEntity.ok(product);
@@ -144,7 +144,7 @@ public class ProductController {
                     schema = @Schema(implementation = ValidationErrorDetails.class)))
     @ApiResponse(responseCode = "404", description = "Product not found",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDetails.class)))
+                    schema = @Schema(implementation = ExceptionResponseDetails.class)))
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDto productDto) {
         ProductDto updatedProduct = productService.updateProduct(id, productDto);
         return ResponseEntity.ok(updatedProduct);
@@ -164,7 +164,7 @@ public class ProductController {
     @ApiResponse(responseCode = "204", description = "Product deleted successfully")
     @ApiResponse(responseCode = "404", description = "Product not found",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDetails.class)))
+                    schema = @Schema(implementation = ExceptionResponseDetails.class)))
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
@@ -257,7 +257,7 @@ public class ProductController {
                     schema = @Schema(implementation = ProductDto.class)))
     @ApiResponse(responseCode = "400", description = "Invalid price range input",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ErrorDetails.class)))
+                    schema = @Schema(implementation = ExceptionResponseDetails.class)))
     public ResponseEntity<List<ProductDto>> getProductsByPriceRange(
             @RequestParam BigDecimal minPrice,
             @RequestParam BigDecimal maxPrice) {

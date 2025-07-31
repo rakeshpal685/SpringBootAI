@@ -1,3 +1,6 @@
+package com.rakesh.product_service.exception.customAnnotationForDTO;
+
+import com.rakesh.product_service.entity.ProductStatus;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.Arrays;

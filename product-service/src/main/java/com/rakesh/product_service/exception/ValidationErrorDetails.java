@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true) // Include fields from the superclass in equals/hashCode
-public class ValidationErrorDetails extends ErrorDetails {
+public class ValidationErrorDetails extends ExceptionResponseDetails {
     private Map<String, String> validationErrors;
 
     public ValidationErrorDetails(LocalDateTime timestamp, String message, String path, String errorCode, Map<String, String> validationErrors) {
